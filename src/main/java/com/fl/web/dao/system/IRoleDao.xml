@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.system.IRoleDao">
+
+    <resultMap type="TRole" id="roleMap">
+        <result property="id" column="id"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleDesc" column="role_desc"/>
+        <result property="posId" column="posId"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryRoleList" resultMap="roleMap" parameterType="Role">
+        SELECT
+        t.id,
+        t.role_code,
+        t.role_name,
+        t.role_desc,
+        t.create_by,
+        t.create_date,
+        t.update_by,
+        t.update_date
+        FROM
+        t_role t
+        where t.status!='003'
+        <if test="roleCode != null">
+            and t.role_code like #{roleCode}
+        </if>
+        <if test="roleName != null">
+            and t.role_name like #{roleName}
+        </if>
+    </select>
+
+    <insert id="saveRole" parameterType="TRole">
+        insert into t_role (id,role_code,role_name,role_desc,create_by,create_date,status)
+        values (#{id}, #{roleCode},#{roleName},#{roleDesc},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <select id="getRoleByCode" resultType="TRole" parameterType="java.lang.String">
+        SELECT
+        t.id,
+        t.role_code roleCode,
+        t.role_name roleName,
+        t.role_desc roleDesc
+        FROM
+        t_role t
+        where t.status!='003' and t.role_code=#{_parameter}
+    </select>
+
+    <select id="getRoleById" resultType="TRole" parameterType="java.lang.String">
+        SELECT
+        t.id,
+        t.role_code roleCode,
+        t.role_name roleName,
+        t.role_desc roleDesc
+        FROM
+        t_role t
+        where t.status!='003' and t.id=#{_parameter}
+    </select>
+
+    <update id="updateRole" parameterType="TRole">
+        update t_role
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="roleName != null">
+                role_name = #{roleName},
+            </if>
+            <if test="roleDesc != null">
+                role_desc = #{roleDesc},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="getRolesByPosId" resultMap="roleMap" parameterType="java.lang.String">
+		SELECT
+			t.id ,
+			t.role_code,
+			t.role_name,
+			t.role_desc,
+			p.pos_id posId
+		FROM
+			t_role t
+		LEFT JOIN (
+			SELECT
+				*
+			FROM
+				t_position_role
+			WHERE
+				pos_id = #{_parameter}
+		) p ON t.id = p.role_id
+	</select>
+
+
+</mapper>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.store.IStoreInfoDao">
+
+    <resultMap type="TStoreInfo" id="storeInfoMap">
+        <result property="id" column="id"/>
+        <result property="wareCode" column="ware_code"/>
+        <result property="wareName" column="wareName"/>
+        <result property="warePosCode" column="ware_pos_code"/>
+        <result property="warePosName" column="warePosName"/>
+        <result property="maktl" column="maktl"/>
+        <result property="maktlName" column="maktlName"/>
+        <result property="matnr" column="matnr"/>
+        <result property="maktx" column="maktx"/>
+        <result property="norms" column="norms"/>
+        <result property="unit" column="unit"/>
+        <result property="manufacturer" column="manufacturer"/>
+        <result property="qualityType" column="quality_type"/>
+        <result property="storeNum" column="store_num"/>
+        <result property="frozenNum" column="frozen_num"/>
+        <result property="usableNum" column="usable_num"/>
+        <result property="companyCode" column="companyCode"/>
+        <result property="company" column="company"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="projectName" column="projectName"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryStoreInfoList" resultMap="storeInfoMap" parameterType="StoreInfo">
+        select
+        st.id,
+        st.matnr,
+        m.maktx,
+        m.norms,
+        m.unit,
+        m.manufacturer,
+        m.quality_type,
+        m.maktl,
+        mt.name maktlName,
+        st.store_num,
+        st.frozen_num,
+        st.usable_num,
+        st.ware_code,
+        w.name wareName,
+        w.company_code companyCode,
+        w.company,
+        st.ware_pos_code,
+        wp.name warePosName,
+        wp.project_code projectCode,
+        d.name projectName
+        from
+        store_info st
+        left join mara m on st.matnr = m.matnr and m.status != '003'
+        left join mara_type mt on m.maktl=mt.maktl and mt.status!='003'
+        left join warehouse w on w.code=st.ware_code and w.status!='003'
+        left join warehouse_pos wp on wp.code=st.ware_pos_code and wp.status!='003'
+        left join data_dictionary d on d.code=wp.project_code and d.group_code='HC008'
+        where st.status!='003'
+        <if test="matnr != null">
+            and st.matnr like #{matnr}
+        </if>
+        <if test="maktx != null">
+            and m.maktx like #{maktx}
+        </if>
+        <if test="norms != null">
+            and m.norms like #{norms}
+        </if>
+        <if test="companyCode != null and companyCode!=''">
+            and w.company_code = #{companyCode}
+        </if>
+        <if test="wareCode != null and wareCode!=''">
+            and st.ware_code = #{wareCode}
+        </if>
+        <if test="warePosCode != null and warePosCode!=''">
+            and st.ware_pos_code = #{warePosCode}
+        </if>
+        <if test="projectCode != null and projectCode!=''">
+            and wp.project_code = #{projectCode}
+        </if>
+        order by st.matnr
+    </select>
+
+    <select id="getStoreInfoByMatnr" resultType="TStoreInfo">
+        select
+            s.id,
+            s.matnr,
+            s.ware_code wareCode,
+            s.ware_pos_code warePosCode
+        from store_info s
+        where s.matnr=#{matnr}
+        and s.ware_code=#{wareCode}
+        and s.ware_pos_code=#{warePosCode}
+        and s.status!='003'
+    </select>
+
+    <insert id="saveStoreInfo" parameterType="TStoreInfo">
+        insert into store_info(id,matnr,store_num,frozen_num,usable_num,ware_code,ware_pos_code,status,create_by,create_date)
+        values
+            (#{id},#{matnr},#{storeNum},#{frozenNum},#{usableNum},#{wareCode},#{warePosCode},#{status},#{createBy},#{createDate})
+    </insert>
+
+    <update id="updateStoreInfo" parameterType="TStoreInfo">
+        update store_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="storeNum != null">
+                store_num = store_num+#{storeNum},
+            </if>
+            <if test="frozenNum != null">
+                frozen_num = frozen_num+#{frozenNum},
+            </if>
+            <if test="usableNum != null">
+                usable_num = usable_num+#{usableNum},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+
+    <update id="updateStoreInfoBatch" parameterType="java.util.List">
+        <foreach close="" collection="list" index="index" item="item" open="" separator=";">
+            update store_info
+            <trim prefix="set" suffixOverrides=",">
+                <if test="item.storeNum != null">
+                    store_num = store_num+#{item.storeNum},
+                </if>
+                <if test="item.frozenNum != null">
+                    frozen_num = frozen_num+#{item.frozenNum},
+                </if>
+                <if test="item.usableNum != null">
+                    usable_num = usable_num+#{item.usableNum},
+                </if>
+                <if test="item.status != null">
+                    status = #{item.status},
+                </if>
+                <if test="item.updateBy != null">
+                    update_by = #{item.updateBy},
+                </if>
+                <if test="item.updateDate != null">
+                    update_date = #{item.updateDate},
+                </if>
+            </trim>
+            <where>
+                matnr=#{item.matnr} and ware_code=#{item.wareCode} and ware_pos_code=#{item.warePosCode}
+            </where>
+        </foreach>
+    </update>
+
+
+</mapper>

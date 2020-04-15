@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.system.IUserInfoDao">
+
+    <resultMap type="TUserInfo" id="userInfoMap">
+        <result property="id" column="id"/>
+        <result property="userName" column="username"/>
+        <result property="realName" column="realname"/>
+        <result property="empCode" column="emp_code"/>
+        <result property="email" column="email"/>
+        <result property="posId" column="pos_id"/>
+        <result property="posCode" column="posCode"/>
+        <result property="posName" column="posName"/>
+        <result property="orgId" column="org_id"/>
+        <result property="orgCode" column="org_code"/>
+        <result property="orgName" column="org_name"/>
+        <result property="sex" column="sex"/>
+        <result property="birthday" column="birthday"/>
+        <result property="phone" column="phone"/>
+        <result property="lockFlag" column="lock_flag"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <!-- 	根据用户名、密码检查启用的用户 -->
+    <select id="checkUserExits" resultType="TUserInfo" parameterType="java.util.Map">
+     select
+        t.id,
+        t.username userName,
+        t.realname realName,
+        t.pos_id posId,
+        p.pos_code posCode,
+        p.pos_name posName,
+        p.org_id orgId,
+        g.org_code orgCode,
+        g.org_name orgName,
+        t.sex sex,
+        t.birthday birthday,
+        t.emp_code empCode,
+        t.email,
+        t.phone phone,
+        t.lock_flag lockFlag
+        from
+        t_user_info t left join t_position p on t.pos_id=p.id and p.status!='003'
+        left join t_org g on p.org_id=g.id
+        where t.status!='003'
+        and (t.username=#{userName} or t.emp_code=#{userName} or t.email=#{userName})
+        and t.password=#{password}
+    </select>
+
+    <select id="getUserByUserName" resultType="TUserInfo" parameterType="java.lang.String">
+     select
+        t.id,
+        t.username userName,
+        t.realname realName,
+        t.pos_id posId,
+        p.pos_code posCode,
+        p.pos_name posName,
+        p.org_id orgId,
+        g.org_code orgCode,
+        g.org_name orgName,
+        t.sex sex,
+        t.birthday birthday,
+        t.emp_code empCode,
+        t.email,
+        t.phone phone,
+        t.lock_flag lockFlag
+        from
+        t_user_info t left join t_position p on t.pos_id=p.id and p.status!='003'
+         left join t_org g on p.org_id=g.id
+        where t.status!='003'
+        and t.username=#{_parameter}
+    </select>
+
+    <insert id="saveUserInfo" parameterType="TUserInfo">
+        INSERT INTO t_user_info (
+        <trim suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userName != null">
+                username,
+            </if>
+            <if test="realName != null">
+                realname,
+            </if>
+            <if test="empCode != null">
+                emp_code,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="posId != null">
+                pos_id,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="birthday != null">
+                birthday,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="lockFlag != null">
+                lock_flag,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        ) VALUES (
+        <trim suffixOverrides=",">
+            <if test="id != null">
+                #{id},
+            </if>
+            <if test="userName != null">
+                #{userName},
+            </if>
+            <if test="realName != null">
+                #{realName},
+            </if>
+            <if test="empCode != null">
+                #{empCode},
+            </if>
+            <if test="email != null">
+                #{email},
+            </if>
+            <if test="password != null">
+                #{password},
+            </if>
+            <if test="posId != null">
+                #{posId},
+            </if>
+            <if test="sex != null">
+                #{sex},
+            </if>
+            <if test="birthday != null">
+                #{birthday},
+            </if>
+            <if test="phone != null">
+                #{phone},
+            </if>
+            <if test="lockFlag != null">
+                #{lockFlag},
+            </if>
+            <if test="createBy != null">
+                #{createBy},
+            </if>
+            <if test="createDate != null">
+                #{createDate},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+        </trim>
+        )
+    </insert>
+
+
+    <select id="queryUserList" resultMap="userInfoMap" parameterType="UserInfo">
+        select
+        t.id,
+        t.username,
+        t.realname,
+        t.pos_id,
+        p.pos_code posCode,
+        p.pos_name posName,
+        t.sex,
+        t.birthday,
+        t.phone,
+        t.emp_code,
+        t.email,
+        t.lock_flag,
+        t.create_by,
+        t.create_date,
+        t.update_by,
+        t.update_date
+        from
+        t_user_info t left join t_position p on t.pos_id=p.id
+        where t.status!='003'
+        <if test="userName != null">
+            and t.username like #{userName}
+        </if>
+        <if test="realName != null">
+            and t.realName like #{realName}
+        </if>
+        order by t.emp_code
+    </select>
+
+
+    <select id="queryUserForPosition" resultMap="userInfoMap" parameterType="UserInfo">
+        select
+        id,
+        username,
+        realname,
+        phone,
+        emp_code,
+        email
+        from t_user_info
+        where id not in (select user_id from t_user_position where pos_id=#{posId} and status!='003')
+        and status!='003' and lock_flag='0'
+        <if test="userName != null">
+            and username like #{userName}
+        </if>
+        <if test="realName != null">
+            and realName like #{realName}
+        </if>
+    </select>
+
+
+    <select id="getUserInfoById" resultType="TUserInfo" parameterType="java.lang.String">
+        select
+        t.id,
+        t.username userName,
+        t.realname realName,
+          t.pos_id posId,
+        p.pos_code posCode,
+        p.pos_name posName,
+        t.sex sex,
+        t.birthday birthday,
+        t.phone phone,
+        t.emp_code empCode,
+        t.email,
+        t.lock_flag lockFlag
+        from
+        t_user_info t left join t_position p on t.pos_id=p.id
+        where t.id=#{_parameter}
+    </select>
+
+
+    <update id="updateUserInfo" parameterType="TUserInfo">
+        update t_user_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="realName != null">
+                realname = #{realName},
+            </if>
+            <if test="empCode != null">
+                emp_code = #{empCode},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="posId != null">
+                pos_id = #{posId},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="lockFlag != null">
+                lock_flag = #{lockFlag},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="getRepairUser" resultMap="userInfoMap" parameterType="java.lang.String">
+        SELECT
+            t.id,
+            t.username,
+            t.realname,
+            t.phone,
+            p.pos_code posCode
+        FROM
+            t_user_info t
+            INNER JOIN t_user_position p ON t.id = p.user_id
+        WHERE
+            t.status != '003'
+            AND p.status != '003'
+            AND p.pos_code = #{_parameter}
+            AND t.lock_flag = '0'
+            AND t.username NOT IN ( SELECT username FROM repair_user WHERE STATUS != '003' )
+    </select>
+
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.qm.ICensorShipHeadDao">
+    <resultMap type="TCensorShipHead" id="censorHeadMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="censorNo" column="censor_no"/>
+        <result property="orderName" column="order_name"/>
+        <result property="supplierCode" column="supplier_code"/>
+        <result property="supplierName" column="supplier_name"/>
+        <result property="consignee" column="consignee"/>
+        <result property="surveyor" column="surveyor"/>
+        <result property="acceptor" column="acceptor"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="status" column="status"/>
+        <result property="submitBy" column="submit_by"/>
+        <result property="submitDate" column="submit_date"/>
+        <result property="state" column="state"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="purchaser" column="purchaser"/>
+        <result property="reqDept" column="req_dept"/>
+        <result property="reqName" column="req_name"/>
+        <result property="exportFlag" column="export_flag"/>
+    </resultMap>
+
+
+    <!-- 	保存数据 -->
+    <insert id="saveCensorHeadList" parameterType="java.util.List">
+        insert into censorship_head
+        (id,order_no,censor_no,supplier_code,supplier_name,purchaser,consignee,surveyor,acceptor,state,export_flag,
+        create_by,create_date,status)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},
+            #{item.orderNo},
+            #{item.censorNo},
+            #{item.supplierCode},
+            #{item.supplierName},
+            #{item.purchaser},
+            #{item.consignee},
+            #{item.surveyor},
+            #{item.acceptor},
+            #{item.state},
+            #{item.exportFlag},
+            #{item.createBy},
+            #{item.createDate},
+            #{item.status})
+        </foreach>
+    </insert>
+
+    <!-- 查询质检单列表-->
+    <select id="queryCensorShipList" resultMap="censorHeadMap" parameterType="CensorShipHead">
+        select
+        ch.id,
+        ch.order_no,
+        ch.censor_no,
+        oh.order_date,
+        oh.company_code,
+        oh.company,
+        oh.project_code,
+        oh.supplier_code,
+        oh.supplier_name,
+        oh.purchaser,
+        oh.req_dept,
+        oh.req_name,
+        ch.consignee,
+        ch.surveyor,
+        ch.acceptor,
+        t.realname create_by,
+        ch.create_date,
+        ch.export_flag
+        from
+        censorship_head ch
+        left join t_user_info t on ch.create_by = t.username
+        left join order_head oh on ch.order_no = oh.order_no
+        where ch.status != '003'
+        <if test="censorNo != null">
+            and ch.censor_no like #{censorNo}
+        </if>
+        order by ch.censor_no desc
+    </select>
+
+
+    <select id="getCensorShipHeadByNo" resultType="TCensorShipHead" parameterType="java.lang.String">
+        SELECT
+        h.id,
+        h.order_no orderNo,
+        h.censor_no censorNo,
+        h.supplier_code supplierCode,
+        h.supplier_name supplierName,
+        h.purchaser,
+        h.consignee,
+        h.surveyor,
+        h.acceptor,
+        h.create_by createBy,
+        h.create_date createDate
+        FROM censorship_head h
+        where h.status!='003' and h.censor_no=#{_parameter}
+    </select>
+
+</mapper>

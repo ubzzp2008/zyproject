@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.mdm.IDeviceInfoDao">
+
+    <resultMap type="TDeviceInfo" id="deviceMap">
+        <result property="id" column="id"/>
+        <result property="deviceSN" column="device_sn"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="deviceNorms" column="device_norms"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryDeviceInfoList" resultMap="deviceMap" parameterType="DeviceInfo">
+        SELECT
+        t.id,
+        t.device_sn,
+        t.device_name,
+        t.device_norms,
+        t.create_by,
+        t.create_date,
+        t.update_by,
+        t.update_date
+        FROM
+        device_info t
+        where t.status!='003'
+        <if test="deviceSN != null">
+            and t.device_sn like #{deviceSN}
+        </if>
+        <if test="deviceName != null">
+            and t.device_name like #{deviceName}
+        </if>
+        <if test="deviceNorms != null">
+            and t.device_norms like #{deviceNorms}
+        </if>
+        order by t.device_sn
+    </select>
+
+    <insert id="saveDeviceInfo" parameterType="TDeviceInfo">
+        insert into device_info (id,device_sn,device_name,device_norms,create_by,create_date,status)
+        values (#{id}, #{deviceSN},#{deviceName},#{deviceNorms},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <select id="getDeviceInfoBySN" resultType="TDeviceInfo" parameterType="java.lang.String">
+        SELECT
+            t.id,
+            t.device_sn deviceSN,
+            t.device_name deviceName,
+            t.device_norms deviceNorms
+        FROM
+        device_info t
+        where t.status!='003' and t.device_sn=#{deviceSN}
+    </select>
+
+    <select id="getDeviceInfoById" resultType="TDeviceInfo" parameterType="java.lang.String">
+        SELECT
+            t.id,
+            t.device_sn deviceSN,
+            t.device_name deviceName,
+            t.device_norms deviceNorms
+        FROM
+        device_info t
+        where t.status!='003' and t.id=#{_parameter}
+    </select>
+
+    <update id="updateDeviceInfo" parameterType="TDeviceInfo">
+        update device_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceName != null">
+                device_name = #{deviceName},
+            </if>
+            <if test="deviceNorms != null">
+                device_norms = #{deviceNorms},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+
+</mapper>

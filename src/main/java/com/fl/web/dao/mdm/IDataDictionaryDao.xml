@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.mdm.IDataDictionaryDao">
+
+    <resultMap type="TDataDictionary" id="dataDictionaryMap">
+        <result property="id" column="id"/>
+        <result property="groupCode" column="group_code"/>
+        <result property="groupName" column="group_name"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="note" column="note"/>
+        <result property="sortnum" column="sortnum"/>
+    </resultMap>
+
+    <!-- 	根据type获取数据 -->
+    <select id="findDataDictionaryByGroup" resultMap="dataDictionaryMap" parameterType="java.lang.String">
+        select id,code,name,group_code,sortnum
+		from data_dictionary
+		where group_code=#{_parameter}
+		order by sortnum
+	</select>
+
+    <select id="queryDataDicList" resultMap="dataDictionaryMap" parameterType="DataDictionary">
+        SELECT
+        t.id,
+        t.code,
+        t.name,
+        t.group_code,
+        d.group_name,
+        t.note,
+        t.sortnum
+        FROM
+        data_dictionary t left join data_dic_type d on t.group_code=d.group_code
+        where 1=1
+        <if test="groupCode != null">
+            and t.group_code = #{groupCode}
+        </if>
+        order by t.group_code,t.sortnum
+    </select>
+
+    <insert id="saveDataDictionary" parameterType="TDataDictionary">
+        insert into data_dictionary (id,group_code,code,name,note,sortnum)
+        values (#{id}, #{groupCode},#{code},#{name},#{note},#{sortnum})
+    </insert>
+
+    <update id="updateDataDictionary" parameterType="TDataDictionary">
+        update data_dictionary
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="note != null">
+                note = #{note},
+            </if>
+            <if test="sortnum != null">
+                sortnum = #{sortnum},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+</mapper>

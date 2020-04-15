@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.system.IMenuDao">
+
+    <resultMap type="TMenu" id="menuMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="seq" column="seq"/>
+        <result property="lockFlag" column="lock_flag"/>
+        <result property="url" column="url"/>
+        <result property="levele" column="levele"/>
+        <result property="pid" column="pid"/>
+        <result property="pname" column="pname"/>
+        <result property="icon" column="icon"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="checkFlag" column="checkFlag"/>
+    </resultMap>
+
+
+    <select id="findMenuByUserId" resultMap="menuMap">
+        select distinct tm.id,tm.name,tm.seq,tm.url,tm.levele,tm.pid,tm.icon,tm.description
+             from t_user_position tup inner join t_position_role tpr on tup.pos_id = tpr.pos_id
+             inner join t_role_menu trm on tpr.role_id = trm.role_id
+             inner join t_menu tm on trm.menu_id = tm.id
+             where tup.user_id = #{userId}  and tup.pos_id=#{posId} and tm.lock_flag = '0'
+             and tm.status != '003' and tup.status != '003'  order by tm.levele,tm.seq
+    </select>
+
+    <select id="queryMenuList" resultMap="menuMap">
+        select
+           tm.id,
+			tm.name ,
+			tm.seq,
+			tm.lock_flag,
+			tm.url,
+			tm.levele,
+			tm.pid,
+			tm.icon,
+            tm.description
+        from
+            t_menu tm
+        where tm.status!='003'
+        order by
+				tm.levele,tm.seq
+    </select>
+
+
+    <select id="getMenuByPid" resultMap="menuMap" parameterType="java.lang.String">
+        select
+           tm.id,
+			tm.name ,
+			tm.seq,
+			tm.url,
+			tm.levele,
+			tm.pid,
+			tm.icon,
+			tm.lock_flag,
+            tm.description
+        from
+            t_menu tm
+        where tm.status!='003' and tm.pid=#{_parameter}
+    </select>
+
+    <select id="getMenuById" resultType="TMenu" parameterType="java.lang.String">
+        select
+           tm.id,
+			tm.name ,
+			tm.seq,
+			tm.url,
+			tm.levele,
+			tm.pid,
+			tm.icon,
+			tm.lock_flag lockFlag,
+            tm.description
+        from
+            t_menu tm
+        where tm.status!='003' and tm.id=#{_parameter}
+    </select>
+
+
+    <insert id="saveMenu" parameterType="TMenu">
+        insert into t_menu (id,name,seq,lock_flag,url,levele,pid,icon,description,create_by,create_date,status)
+        values (#{id}, #{name},#{seq},#{lockFlag},#{url},#{levele},#{pid},#{icon},#{description},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <update id="updateMenu" parameterType="TMenu">
+        update t_menu
+         set name = #{name},
+                seq = #{seq},
+                lock_flag=#{lockFlag},
+                url=#{url},
+                icon=#{icon},
+                description=#{description},
+                status = #{status},
+                update_by = #{updateBy},
+                update_date = #{updateDate}
+        where
+            id = #{id}
+    </update>
+
+    <update id="lockOrUnlockMenu" parameterType="TMenu">
+        update t_menu
+         set lock_flag=#{lockFlag},
+                status = #{status},
+                update_by = #{updateBy},
+                update_date = #{updateDate}
+        where
+            id = #{id}
+    </update>
+
+    <update id="deleteMenuById" parameterType="java.util.Map">
+        update t_menu
+         set status = #{status},update_by = #{updateBy},update_date = #{updateDate}
+        where id = #{id}
+    </update>
+
+
+    <select id="getMenuByRoleId" resultMap="menuMap" parameterType="java.lang.String">
+		select
+			tm.id,
+			tm.name ,
+			tm.pid,
+			tm.description,
+			case when tr.role_id is null then 'N' else 'Y' end as checkFlag
+		from
+				t_menu tm left join (select * from t_role_menu where role_id=#{_parameter} ) tr on tm.id=tr.menu_id
+ 		where
+ 			    tm.status!='003'
+		order by
+				tm.levele,tm.seq
+	</select>
+
+
+</mapper>

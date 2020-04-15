@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.system.IUserPositionDao">
+
+    <resultMap type="TUserPosition" id="userPosMap">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="userName"/>
+        <result property="realName" column="realName"/>
+        <result property="posId" column="pos_id"/>
+        <result property="posCode" column="posCode"/>
+        <result property="posName" column="posName"/>
+        <result property="posType" column="pos_type"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <!-- 	 根据用户ID删除数据 -->
+    <!--<delete id="deleteByUserId" parameterType="java.lang.String">
+        delete from t_user_role where user_id = #{_parameter}
+	</delete>-->
+
+    <!-- 	 根据角色ID删除数据 -->
+    <!--<delete id="deleteByRoleId" parameterType="java.lang.String">
+        delete from t_user_role where role_id = #{_parameter}
+    </delete>-->
+
+
+    <update id="updateUserPositionByUserId" parameterType="java.util.Map">
+        update t_user_position set end_date=#{endDate},status=#{status},update_by=#{updateBy},update_date=#{updateDate}
+        where user_id=#{userId} and status!='003'
+        <if test="posId != null">
+            and pos_id = #{posId}
+        </if>
+    </update>
+
+    <update id="deleteUserPositionBatch" parameterType="java.util.Map">
+        update t_user_position set end_date=#{endDate},status=#{status},update_by=#{updateBy},update_date=#{updateDate}
+        where status!='003' and id in
+        <foreach collection="idList" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="saveUserPosition" parameterType="TUserPosition">
+        insert into t_user_position (id,user_id,pos_id,pos_code,pos_type,start_date,end_date,status,create_by,create_date)
+        values (#{id},#{userId},#{posId},#{posCode},#{posType},#{startDate},#{endDate},#{status},#{createBy},#{createDate})
+    </insert>
+
+    <!-- 		批量保存数据 -->
+    <insert id="saveUserPositionBatch" parameterType="java.util.List">
+        insert into t_user_position
+        (id,user_id,pos_id,pos_code,pos_type,start_date,end_date,status,create_by,create_date) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.userId},#{item.posId},#{item.posCode},#{item.posType},#{item.startDate},#{item.endDate},#{item.status},#{item.createBy},#{item.createDate})
+        </foreach>
+    </insert>
+
+
+    <select id="queryUserPositionList" resultMap="userPosMap" parameterType="UserPosition">
+        SELECT
+        tup.id,
+        tup.user_id,
+        tu.username,
+        tu.realname,
+        tup.pos_id,
+        tp.pos_code posCode,
+        tp.pos_name posName,
+        tup.pos_type,
+        tup.start_date,
+        tup.end_date
+        FROM
+        t_user_position tup
+        LEFT JOIN t_user_info tu ON tup.user_id = tu.id
+        LEFT JOIN t_position tp ON tup.pos_id = tp.id
+        WHERE tup.status != '003'
+        <if test="userName != null">
+            and tu.username like #{userName}
+        </if>
+        <if test="realName != null">
+            and tu.realName like #{realName}
+        </if>
+        <if test="posCode != null">
+            and tp.pos_code like #{posCode}
+        </if>
+        <if test="posName != null">
+            and tp.pos_name like #{posName}
+        </if>
+    </select>
+
+</mapper>

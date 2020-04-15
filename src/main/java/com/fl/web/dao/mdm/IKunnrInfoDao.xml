@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.mdm.IKunnrInfoDao">
+
+    <resultMap type="TKunnrInfo" id="kunnrMap">
+        <result property="id" column="id"/>
+        <result property="kunnr" column="kunnr"/>
+        <result property="kunnrName" column="kunnr_name"/>
+        <result property="address" column="address"/>
+        <result property="contactInfo" column="contact_info"/>
+        <result property="contactTel" column="contact_tel"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryKunnrInfoList" resultMap="kunnrMap" parameterType="KunnrInfo">
+        SELECT
+        t.id,
+        t.kunnr,
+        t.kunnr_name,
+        t.address,
+        t.contact_info,
+        t.contact_tel,
+        t.create_by,
+        t.create_date,
+        t.update_by,
+        t.update_date
+        FROM
+        kunnr_info t
+        where t.status!='003'
+        <if test="kunnr != null">
+            and t.kunnr like #{kunnr}
+        </if>
+        <if test="kunnrName != null">
+            and t.kunnr_name like #{kunnrName}
+        </if>
+        <if test="address != null">
+            and t.address like #{address}
+        </if>
+        order by t.kunnr
+    </select>
+
+    <insert id="saveKunnrInfo" parameterType="TKunnrInfo">
+        insert into kunnr_info (id,kunnr,kunnr_name,address,contact_info,contact_tel,create_by,create_date,status)
+        values (#{id}, #{kunnr},#{kunnrName},#{address},#{contactInfo},#{contactTel},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <select id="getKunnrInfoByKunnr" resultType="TKunnrInfo" parameterType="java.lang.String">
+        SELECT
+            t.id,
+            t.kunnr,
+            t.kunnr_name kunnrName,
+            t.address,
+            t.contact_info contactInfo,
+            t.contact_tel contactTel
+        FROM
+        kunnr_info t
+        where t.status!='003' and t.kunnr=#{_parameter}
+    </select>
+
+    <select id="getKunnrInfoById" resultType="TKunnrInfo" parameterType="java.lang.String">
+        SELECT
+            t.id,
+            t.kunnr,
+            t.kunnr_name kunnrName,
+            t.address,
+            t.contact_info contactInfo,
+            t.contact_tel contactTel
+        FROM
+        kunnr_info t
+        where t.status!='003' and t.id=#{_parameter}
+    </select>
+
+    <update id="updateKunnrInfo" parameterType="TKunnrInfo">
+        update kunnr_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="kunnrName != null">
+                kunnr_name = #{kunnrName},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="contactInfo != null">
+                contact_info = #{contactInfo},
+            </if>
+            <if test="contactTel != null">
+                contact_tel = #{contactTel},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+
+</mapper>

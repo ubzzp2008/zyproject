@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.mdm.ISupplierInfoDao">
+
+    <resultMap type="TSupplierInfo" id="supplierMap">
+        <result property="id" column="id"/>
+        <result property="supplierCode" column="supplier_code"/>
+        <result property="supplierName" column="supplier_name"/>
+        <result property="supplierType" column="supplier_type"/>
+        <result property="address" column="address"/>
+        <result property="contact" column="contact"/>
+        <result property="contactTel" column="contact_tel"/>
+        <result property="telphone" column="telphone"/>
+        <result property="bankType" column="bank_type"/>
+        <result property="bankAccount" column="bank_account"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="querySupplierInfoList" resultMap="supplierMap" parameterType="SupplierInfo">
+        SELECT
+        t.id,
+        t.supplier_code,
+        t.supplier_name,
+        t.supplier_type,
+        t.address,
+        t.contact,
+        t.contact_tel,
+        t.telphone,
+        t.bank_account,
+        t.bank_type
+        FROM
+        supplier_info t
+        where t.status!='003'
+        <if test="supplierCode != null">
+            and t.supplier_code like #{supplierCode}
+        </if>
+        <if test="supplierName != null">
+            and t.supplier_name like #{supplierName}
+        </if>
+        <if test="supplierType != null">
+            and t.supplier_type = #{supplierType}
+        </if>
+        order by t.supplier_code
+    </select>
+
+    <insert id="saveSupplierInfo" parameterType="TSupplierInfo">
+        insert into supplier_info (id,supplier_code,supplier_name,supplier_type,address,contact,contact_tel,telphone,bank_type,bank_account,create_by,create_date,status)
+        values (#{id}, #{supplierCode},#{supplierName},#{supplierType},#{address},#{contact},#{contactTel},#{telphone},#{bankType},#{bankAccount},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <update id="updateSupplierInfo" parameterType="TSupplierInfo">
+        update supplier_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="supplierName != null">
+                supplier_name = #{supplierName},
+            </if>
+            <if test="supplierType != null">
+                supplier_type = #{supplierType},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="contact != null">
+                contact = #{contact},
+            </if>
+            <if test="contactTel != null">
+                contact_tel = #{contactTel},
+            </if>
+            <if test="telphone != null">
+                telphone = #{telphone},
+            </if>
+            <if test="bankType != null">
+                bank_type = #{bankType},
+            </if>
+            <if test="bankAccount != null">
+                bank_account = #{bankAccount},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+
+</mapper>

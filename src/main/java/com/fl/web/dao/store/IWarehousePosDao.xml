@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.store.IWarehousePosDao">
+
+    <resultMap type="TWarehousePos" id="warehousePosMap">
+        <result property="id" column="id"/>
+        <result property="wareCode" column="ware_code"/>
+        <result property="wareName" column="wareName"/>
+        <result property="companyCode" column="companyCode"/>
+        <result property="company" column="company"/>
+        <result property="projectCode" column="project_code"/>
+        <result property="projectName" column="projectName"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="safeNum" column="safe_num"/>
+        <result property="num" column="num"/>
+        <result property="note" column="note"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryWarehousePosList" resultMap="warehousePosMap" parameterType="WarehousePos">
+        select
+        p.id,
+        p.code,
+        p.name,
+        p.ware_code,
+        w.name wareName ,
+        p.project_code,
+        d.name projectName,
+        w.company_code companyCode,
+        w.company,
+        p.safe_num,
+        p.num,
+        p.note
+        from
+        warehouse_pos p left join warehouse w on p.ware_code=w.code
+        left join data_dictionary d on d.code=p.project_code and d.group_code='HC008'
+        where p.status!='003'
+        <if test="wareCode != null and wareCode != '' ">
+            and p.ware_code like #{wareCode}
+        </if>
+        <if test="code != null">
+            and p.code like #{code}
+        </if>
+        <if test="name != null">
+            and p.name like #{name}
+        </if>
+        order by p.ware_code,p.code
+    </select>
+
+    <insert id="saveWarehousePos" parameterType="TWarehousePos">
+        insert into warehouse_pos(id,code,name,ware_code,project_code,safe_num,num,note,status,create_by,create_date)
+        values
+        (#{id},#{code},#{name},#{wareCode},#{projectCode},#{safeNum},#{num},#{note},#{status},
+        #{createBy},#{createDate})
+    </insert>
+
+    <select id="getWarehousePosByCode" resultType="TWarehousePos" parameterType="java.lang.String">
+        SELECT
+        p.id,
+        p.code,
+        p.name,
+        p.ware_code wareCode,
+        w.name wareName,
+        p.project_code projectCode,
+        d.name projectName,
+        w.company_code companyCode,
+        w.company company,
+        p.safe_num safeNum,
+        p.num,
+        p.note
+        FROM
+        warehouse_pos p left join warehouse w on p.ware_code=w.code
+         left join data_dictionary d on d.code=p.project_code and d.group_code='HC008'
+        where p.status!='003' and p.code=#{_parameter}
+    </select>
+
+    <select id="getWarehousePosById" resultType="TWarehousePos" parameterType="java.lang.String">
+        SELECT
+         p.id,
+        p.code,
+        p.name,
+        p.ware_code wareCode,
+        w.name wareName,
+        p.project_code projectCode,
+        d.name projectName,
+        w.company_code companyCode,
+        w.company company,
+        p.safe_num safeNum,
+        p.num,
+        p.note
+        FROM
+        warehouse_pos p left join warehouse w on p.ware_code=w.code
+         left join data_dictionary d on d.code=p.project_code and d.group_code='HC008'
+        where p.status!='003' and p.id=#{_parameter}
+    </select>
+
+    <update id="updateWarehousePos" parameterType="TWarehousePos">
+        update warehouse_pos
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="safeNum != null">
+                safe_num = #{safeNum},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="note != null">
+                note = #{note},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>

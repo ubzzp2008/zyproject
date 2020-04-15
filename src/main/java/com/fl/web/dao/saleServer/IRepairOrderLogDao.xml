@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.saleServer.IRepairOrderLogDao">
+
+    <resultMap type="TRepairOrderLog" id="repairLogMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="description" column="description"/>
+        <result property="posCode" column="pos_code"/>
+        <result property="posName" column="pos_name"/>
+        <result property="reason" column="reason"/>
+        <result property="realname" column="realname"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+    </resultMap>
+
+    <insert id="saveRepairOrderLog" parameterType="TRepairOrderLog">
+        insert into repair_order_log (id,order_no,order_status,description,pos_code,pos_name,reason,realname,create_by,create_date) values
+            (#{id},#{orderNo},#{orderStatus},#{description},#{posCode},#{posName},
+            #{reason},#{realname},#{createBy},#{createDate})
+    </insert>
+
+    <insert id="saveRepairOrderLogBatch" parameterType="java.util.List">
+        insert into repair_order_log
+        (id,order_no,order_status,description,pos_code,pos_name,reason,realname,create_by,create_date)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.orderNo},#{item.orderStatus},#{item.description},#{item.posCode},#{item.posName},
+            #{item.reason},#{item.realname},#{item.createBy},#{item.createDate})
+        </foreach>
+    </insert>
+
+
+    <select id="getLogInfoByOrderId" resultType="TRepairOrderLog" parameterType="java.lang.String">
+        select h.order_no orderNo,h.order_status orderStatus
+        from repair_order_head h
+        where h.id = #{_parameter}
+    </select>
+
+
+    <select id="getLogInfoByOrderIdList" resultMap="repairLogMap" parameterType="java.util.List">
+        select h.order_no,h.order_status
+        from repair_order_head h
+        where h.id in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getOrderLogListByOrderNo" resultMap="repairLogMap" parameterType="java.lang.String">
+        select t.id,t.order_no,t.order_status,t.description,t.pos_code,t.pos_name,t.reason,t.realname,t.create_by,t.create_date
+        from repair_order_log t
+        where t.order_no= #{_parameter}
+        order by t.create_date desc
+    </select>
+
+</mapper>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.mdm.IMaraDao">
+
+    <resultMap type="TMara" id="maraMap">
+        <result property="id" column="id"/>
+        <result property="matnr" column="matnr"/>
+        <result property="maktx" column="maktx"/>
+        <result property="maktl" column="maktl"/>
+        <result property="maktlName" column="maktlName"/>
+        <result property="unit" column="unit"/>
+        <result property="price" column="price"/>
+        <result property="norms" column="norms"/>
+        <result property="manufacturer" column="manufacturer"/>
+        <result property="qualityType" column="quality_type"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryMaraList" resultMap="maraMap" parameterType="Mara">
+        SELECT
+        m.id,
+        m.matnr,
+        m.maktx,
+        m.maktl,
+        t.name maktlName,
+        m.unit,
+        m.price,
+        m.norms,
+        m.manufacturer,
+        m.quality_type,
+        m.create_by,
+        m.create_date,
+        m.update_by,
+        m.update_date
+        FROM
+        mara m left join mara_type t on t.maktl=m.maktl
+        where m.status!='003'
+        <if test="matnr != null">
+            and m.matnr like #{matnr}
+        </if>
+        <if test="maktx != null">
+            and m.maktx like #{maktx}
+        </if>
+        <if test="norms != null">
+            and m.norms like #{norms}
+        </if>
+        <if test="maktl != null and maktl!=''">
+            and m.maktl = #{maktl}
+        </if>
+        order by m.matnr
+    </select>
+
+
+    <insert id="saveMara" parameterType="TMara">
+        insert into mara (id,matnr,maktx,maktl,unit,price,norms,manufacturer,quality_type,create_by,create_date,status)
+        values (#{id}, #{matnr},#{maktx},#{maktl},#{unit},#{price},#{norms}, #{manufacturer},#{qualityType},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <insert id="saveMaraBatch" parameterType="java.util.List">
+        insert into mara (id,matnr,maktx,maktl,unit,price,norms,manufacturer,quality_type,create_by,create_date,status)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.matnr},#{item.maktx},#{item.maktl},#{item.unit},#{item.price},#{item.norms},
+            #{item.manufacturer},#{item.qualityType},#{item.createBy},#{item.createDate},#{item.status})
+        </foreach>
+    </insert>
+
+
+    <select id="getMaraByMatnr" resultType="TMara" parameterType="java.lang.String">
+        SELECT
+        m.id,
+        m.matnr,
+        m.maktx,
+        m.maktl,
+        m.unit,
+        m.norms,
+        m.manufacturer,
+        m.quality_type qualityType
+        FROM
+        mara m
+        where m.status!='003' and m.matnr=#{_parameter}
+    </select>
+
+    <select id="getMaraById" resultType="TMara" parameterType="java.lang.String">
+        SELECT
+        m.id,
+        m.matnr,
+        m.maktx,
+        m.maktl,
+        t.name maktlName,
+        m.unit,
+        m.norms,
+        m.manufacturer,
+        m.quality_type qualityType
+        FROM
+        mara m left join mara_type t on m.maktl=t.maktl and t.status!='003'
+        where m.status!='003'  and m.id=#{_parameter}
+    </select>
+
+    <update id="updateMara" parameterType="TMara">
+        update mara
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="maktx != null">
+                maktx = #{maktx},
+            </if>
+            <if test="maktl != null">
+                maktl = #{maktl},
+            </if>
+            <if test="unit != null">
+                unit = #{unit},
+            </if>
+            <if test="norms != null">
+                norms = #{norms},
+            </if>
+            <if test="manufacturer != null">
+                manufacturer = #{manufacturer},
+            </if>
+            <if test="qualityType != null">
+                quality_type = #{qualityType},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+
+    <!--跨库查询金蝶物料数据-->
+    <select id="searchKdMaraList" resultMap="maraMap" parameterType="Mara">
+        SELECT
+        m.id,
+        m.matnr,
+        m.maktx,
+        m.unit,
+        m.norms,
+        m.manufacturer,
+        m.quality_type
+        FROM
+        hcsys8081.kd_mara m
+        where m.status!='003'
+        <if test="matnr != null and matnr!=''">
+            and m.matnr like #{matnr}
+        </if>
+        <if test="maktx != null and maktx!=''">
+            and m.maktx like #{maktx}
+        </if>
+        <if test="norms != null and norms!=''">
+            and m.norms like #{norms}
+        </if>
+        order by m.matnr
+    </select>
+
+</mapper>

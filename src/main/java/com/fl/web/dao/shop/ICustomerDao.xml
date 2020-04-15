@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.shop.ICustomerDao">
+
+    <resultMap type="TCustomer" id="custMap">
+        <result property="id" column="id"/>
+        <result property="userName" column="username"/>
+        <result property="phone" column="phone"/>
+        <result property="sex" column="sex"/>
+        <result property="birthday" column="birthday"/>
+        <result property="addDate" column="add_date"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+
+    <select id="queryCustomerList" resultMap="custMap" parameterType="Customer">
+        select
+        t.id,
+        t.username,
+        t.phone,
+        t.sex,
+        t.birthday,
+        t.add_date,
+        t.create_by,
+        t.create_date,
+        t.update_by,
+        t.update_date
+        from
+        customer_info t
+        where t.status!='003'
+        <if test="userName != null">
+            and t.username like #{userName}
+        </if>
+        <if test="phone != null">
+            and t.phone like #{phone}
+        </if>
+    </select>
+
+    <insert id="saveCustomer" parameterType="TCustomer">
+        insert into customer_info (id,username,phone,sex,birthday,add_date,create_by,create_date,status)
+        values (#{id}, #{userName},#{phone},#{sex},#{birthday},#{addDate},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <update id="updateCustomer" parameterType="TCustomer">
+        update customer_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userName != null">
+                username = #{userName},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>

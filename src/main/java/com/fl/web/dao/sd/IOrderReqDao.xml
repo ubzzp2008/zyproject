@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.sd.IOrderReqDao">
+
+    <resultMap type="TOrderReq" id="reqMap">
+        <result property="id" column="id"/>
+        <result property="reqId" column="reqId"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="projectCode" column="project_code"/>
+        <result property="projectName" column="projectName"/>
+        <result property="companyCode" column="company_code"/>
+        <result property="company" column="company"/>
+        <result property="suggestSupplier" column="suggest_supplier"/>
+        <result property="wishDate" column="wish_date"/>
+        <result property="reqDept" column="req_dept"/>
+        <result property="reqName" column="req_name"/>
+        <result property="reqDate" column="req_date"/>
+        <result property="reqStatus" column="req_status"/>
+        <result property="reqStatusStr" column="reqStatusStr"/>
+        <result property="reqNote" column="req_note"/>
+        <result property="reqFlag" column="req_flag"/>
+        <result property="matnr" column="matnr"/>
+        <result property="maktx" column="maktx"/>
+        <result property="norms" column="norms"/>
+        <result property="unit" column="unit"/>
+        <result property="price" column="price"/>
+        <result property="money" column="money"/>
+        <result property="maktl" column="maktl"/>
+        <result property="maktlName" column="maktlName"/>
+        <result property="num" column="num"/>
+        <result property="manufacturer" column="manufacturer"/>
+        <result property="qualityType" column="quality_type"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryOrderReqList" resultMap="reqMap" parameterType="OrderReq">
+        SELECT
+        t.id,
+        t.order_no,
+        t.company_code,
+        t.company,
+        t.project_code,
+        d.name projectName,
+        t.suggest_supplier,
+        t.wish_date,
+        t.maktl,
+        mt.NAME maktlName,
+        t.matnr,
+        t.maktx,
+        t.norms,
+        t.unit,
+        t.manufacturer,
+        t.quality_type,
+        t.num,
+        t.price,
+        t.money,
+        t.req_dept,
+        t.req_name,
+        t.req_date,
+        t.req_status,
+        d1.name reqStatusStr,
+        t.req_note,
+        t.req_flag,
+        t.create_date
+        from
+        order_req t
+        left join mara_type mt on t.maktl = mt.maktl
+        left join data_dictionary d on t.project_code=d.code and d.group_code='HC008'
+        left join data_dictionary d1 on t.req_status=d1.code and d1.group_code='HC009'
+        where
+        t.status != '003'
+        <if test="companyCode != null and companyCode!='' ">
+            and t.company_code = #{companyCode}
+        </if>
+        <if test="projectCode != null and projectCode!='' ">
+            and t.project_code = #{projectCode}
+        </if>
+        <if test="matnr != null and matnr!='' ">
+            and t.matnr like #{matnr}
+        </if>
+        <if test="maktx != null and maktx!='' ">
+            and t.maktx like #{maktx}
+        </if>
+        <if test="norms != null and norms!='' ">
+            and t.norms like #{norms}
+        </if>
+        <if test="reqStatus != null and reqStatus!=''  ">
+            and t.req_status = #{reqStatus}
+        </if>
+        <if test="reqFlag != null and reqFlag!=''  ">
+            and t.req_flag = #{reqFlag}
+        </if>
+        <if test="enquiryBy != null and enquiryBy!=''  ">
+            and t.enquiry_by = #{enquiryBy}
+        </if>
+        order by t.create_date desc
+    </select>
+
+    <insert id="saveOrderReqBatch" parameterType="java.util.List">
+        insert into order_req (
+        id,
+        company_code,
+        company,
+        project_code,
+        matnr,
+        maktx,
+        norms,
+        unit,
+        maktl,
+        manufacturer,
+        quality_type,
+        num,
+        price,
+        suggest_supplier,
+        wish_date,
+        req_dept,
+        req_name,
+        req_date,
+        req_status,
+        req_note,
+        req_flag,
+        status,
+        create_by,
+        create_date)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},
+            #{item.companyCode},
+            #{item.company},
+            #{item.projectCode},
+            #{item.matnr},
+            #{item.maktx},
+            #{item.norms},
+            #{item.unit},
+            #{item.maktl},
+            #{item.manufacturer},
+            #{item.qualityType},
+            #{item.num},
+            #{item.price},
+            #{item.suggestSupplier},
+            #{item.wishDate},
+            #{item.reqDept},
+            #{item.reqName},
+            #{item.reqDate},
+            #{item.reqStatus},
+            #{item.reqNote},
+            #{item.reqFlag},
+            #{item.status},
+            #{item.createBy},
+            #{item.createDate})
+        </foreach>
+    </insert>
+
+
+    <select id="getOrderReqById" resultType="TOrderReq" parameterType="java.lang.String">
+        select
+       t.id,
+        t.order_no orderNo,
+        t.company_code companyCode,
+        t.company,
+        t.project_code projectCode,
+        d.name projectName,
+        t.suggest_supplier suggestSupplier,
+        t.wish_date wishDate,
+        t.maktl,
+        mt.NAME maktlName,
+        t.matnr,
+        t.maktx,
+        t.norms,
+        t.unit,
+        t.manufacturer,
+        t.quality_type qualityType,
+        t.num,
+        t.req_dept reqDept,
+        t.req_name reqName,
+        t.req_date reqDate,
+        t.req_note reqNote,
+        t.req_flag reqFlag
+        from
+        order_req t
+        left join mara_type mt on t.maktl = mt.maktl
+        left join data_dictionary d on t.project_code=d.code and d.group_code='HC008'
+        where t.id=#{_parameter} and  t.status!='003'
+    </select>
+
+
+    <update id="updateOrderReq" parameterType="TOrderReq">
+        update order_req
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="projectCode != null">
+                project_code = #{projectCode},
+            </if>
+            <if test="suggestSupplier != null">
+                suggest_supplier = #{suggestSupplier},
+            </if>
+            <if test="wishDate != null">
+                wish_date = #{wishDate},
+            </if>
+            <if test="maktl != null">
+                maktl = #{maktl},
+            </if>
+            <if test="maktx != null">
+                maktx = #{maktx},
+            </if>
+            <if test="norms != null">
+                norms = #{norms},
+            </if>
+            <if test="unit != null">
+                unit = #{unit},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="reqStatus != null">
+                req_status = #{reqStatus},
+            </if>
+            <if test="reqDate != null">
+                req_date = #{reqDate},
+            </if>
+            <if test="reqNote != null">
+                req_note = #{reqNote},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+
+    <select id="checkReqStatus" resultType="java.lang.Integer">
+        select count(1) from order_req where id=#{id}  and req_status!=#{reqStatus} and status!='003'
+    </select>
+
+    <select id="checkReqStatusBatch" resultType="java.lang.Integer">
+        select count(1) from order_req where id in
+        <foreach collection="idList" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and req_status!=#{reqStatus} and status!='003'
+    </select>
+
+    <update id="updateOrderReqStatusBatch" parameterType="java.util.Map">
+        update order_req
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reqStatus != null">
+                req_status = #{reqStatus},
+            </if>
+            <if test="enquiryBy != null">
+                enquiry_by = #{enquiryBy},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id in
+            <foreach collection="idList" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </update>
+
+    <update id="updateOrderReqStatus" parameterType="java.util.Map">
+        update order_req
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reqStatus != null">
+                req_status = #{reqStatus},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id =#{id}
+        </where>
+    </update>
+
+    <update id="updateOrderNoById" parameterType="java.util.Map">
+        update order_req
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderNo != null">
+                order_no = #{orderNo},
+            </if>
+            <if test="matnr != null">
+                matnr = #{matnr},
+            </if>
+            <if test="reqStatus != null">
+                req_status = #{reqStatus},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <update id="updateOrderReqBatch" parameterType="java.util.List">
+        <foreach close="" collection="list" index="index" item="item" open="" separator=";">
+            update order_req
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="item.price != null">
+                    price = #{item.price},
+                </if>
+                <if test="item.money != null">
+                    money = #{item.money},
+                </if>
+                <if test="item.reqStatus != null">
+                    req_status = #{item.reqStatus},
+                </if>
+                <if test="item.qualityType != null">
+                    quality_type = #{item.qualityType},
+                </if>
+                <if test="item.status != null">
+                    status = #{item.status},
+                </if>
+                <if test="item.updateBy != null">
+                    update_by = #{item.updateBy},
+                </if>
+                <if test="item.updateDate != null">
+                    update_date = #{item.updateDate},
+                </if>
+            </trim>
+            <where>
+                id = #{item.id}
+            </where>
+        </foreach>
+    </update>
+
+    <delete id="deleteOrderReqBatch" parameterType="java.util.List">
+        delete from order_req where id in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="queryOrderReqByIdList" resultMap="reqMap" parameterType="java.util.List">
+        SELECT
+        t.id,
+        t.order_no,
+        t.company_code,
+        t.company,
+        t.project_code,
+        d.name projectName,
+        t.suggest_supplier,
+        t.wish_date,
+        t.maktl,
+        mt.NAME maktlName,
+        t.matnr,
+        t.maktx,
+        t.norms,
+        t.unit,
+        t.manufacturer,
+        t.quality_type,
+        t.num,
+        t.price,
+        t.money,
+        t.req_dept,
+        t.req_name,
+        t.req_date,
+        t.req_status,
+        t.req_note,
+        t.req_flag,
+        t.create_date
+        from
+        order_req t
+        left join mara_type mt on t.maktl = mt.maktl
+        left join data_dictionary d on t.project_code=d.code and d.group_code='HC008'
+        where t.id in
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and t.status != '003'
+    </select>
+
+</mapper>

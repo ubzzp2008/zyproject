@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.store.IStoreItemDao">
+
+    <resultMap type="TStoreItem" id="storeItemMap">
+        <result property="id" column="id"/>
+        <result property="storeNo" column="store_no"/>
+        <result property="itemNo" column="item_no"/>
+        <result property="matnr" column="matnr"/>
+        <result property="maktx" column="maktx"/>
+        <result property="norms" column="norms"/>
+        <result property="unit" column="unit"/>
+        <result property="manufacturer" column="manufacturer"/>
+        <result property="qualityType" column="qualityType"/>
+        <result property="maktl" column="maktl"/>
+        <result property="maktlName" column="maktlName"/>
+        <result property="wareCode" column="ware_code"/>
+        <result property="wareName" column="wareName"/>
+        <result property="companyCode" column="companyCode"/>
+        <result property="company" column="company"/>
+        <result property="warePosCode" column="ware_pos_code"/>
+        <result property="warePosName" column="warePosName"/>
+        <result property="projectCode" column="projectCode"/>
+        <result property="projectName" column="projectName"/>
+        <result property="deliveryId" column="delivery_id"/>
+        <result property="censorId" column="censor_id"/>
+        <result property="orderItemId" column="order_item_id"/>
+        <result property="optNum" column="opt_num"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <insert id="saveStoreItemBatch" parameterType="java.util.List">
+        insert into store_item
+        (id,store_no,item_no,matnr,ware_code,ware_pos_code,opt_num,delivery_id,censor_id,order_item_id,status,create_by,create_date)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.storeNo},#{item.itemNo},#{item.matnr},#{item.wareCode},#{item.warePosCode},#{item.optNum},
+            #{item.deliveryId},#{item.censorId},#{item.orderItemId},#{item.status},#{item.createBy},#{item.createDate})
+        </foreach>
+    </insert>
+
+    <select id="getStoreItemByStoreNo" resultMap="storeItemMap">
+        select
+            si.id,
+            si.store_no,
+            si.item_no,
+            si.matnr,
+            m.maktx,
+            m.norms,
+            m.unit,
+            m.manufacturer,
+            m.quality_type qualityType,
+            m.maktl,
+            mt.name maktlName,
+            si.ware_code,
+            w.name wareName,
+            w.company_code companyCode,
+            w.company,
+            si.ware_pos_code,
+            wp.name warePosName,
+            wp.project_code projectCode,
+            d.name projectName,
+            si.opt_num
+        from
+            store_item si
+            left join mara m on si.matnr = m.matnr
+            left join mara_type mt on mt.maktl = m.maktl
+            left join warehouse w on si.ware_code = w.code
+            left join warehouse_pos wp on si.ware_pos_code = wp.code
+            left join data_dictionary d on d.code = wp.project_code and group_code = 'HC008'
+        where si.store_no=#{storeNo}
+        order by si.item_no
+    </select>
+
+</mapper>

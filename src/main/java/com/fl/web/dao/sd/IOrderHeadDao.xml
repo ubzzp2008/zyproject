@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.sd.IOrderHeadDao">
+
+    <resultMap type="TOrderHead" id="orderHeadMap">
+        <result property="id" column="id"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="companyCode" column="company_code"/>
+        <result property="company" column="company"/>
+        <result property="supplierCode" column="supplier_code"/>
+        <result property="supplierName" column="supplier_name"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="projectCode" column="project_code"/>
+        <result property="projectName" column="projectName"/>
+        <result property="arrivalDate" column="arrival_date"/>
+        <result property="reqDept" column="req_dept"/>
+        <result property="reqName" column="req_name"/>
+        <result property="purchaser" column="purchaser"/>
+        <result property="payType" column="pay_type"/>
+        <result property="totalMoney" column="total_money"/>
+        <result property="actualMoney" column="actual_money"/>
+        <result property="restMoney" column="rest_money"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="orderStatusStr" column="orderStatusStr"/>
+        <result property="note" column="note"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryOrderList" resultMap="orderHeadMap" parameterType="OrderHead">
+        SELECT
+        h.id,
+        h.order_no,
+        h.company_code,
+        h.company,
+        h.supplier_code,
+        h.supplier_name,
+        h.order_date,
+        h.project_code,
+        d.name projectName,
+        h.arrival_date,
+        h.req_dept,
+        h.req_name,
+        h.purchaser,
+        h.pay_type,
+        h.total_money,
+        h.actual_money,
+        h.rest_money,
+        h.order_status,
+        d1.name orderStatusStr,
+        h.note,
+        h.create_by,
+        h.create_date
+        FROM
+        order_head h
+        left join data_dictionary d on h.project_code=d.code and d.group_code='HC008'
+        left join data_dictionary d1 on h.order_status=d1.code and d1.group_code='HC010'
+        WHERE
+        h.status != '003'
+        <if test="supplierCode != null">
+            and h.supplier_code like #{supplierCode}
+        </if>
+        <if test="supplierName != null">
+            and h.supplier_name like #{supplierName}
+        </if>
+        <if test="orderNo != null">
+            and h.order_no like #{orderNo}
+        </if>
+        <if test="orderStatus != null and orderStatus!='' ">
+            and h.order_status = #{orderStatus}
+        </if>
+        <if test="companyCode != null and companyCode!='' ">
+            and h.company_code = #{companyCode}
+        </if>
+        <if test="projectCode != null and projectCode!='' ">
+            and h.project_code = #{projectCode}
+        </if>
+        <if test="orderDateStart != null and orderDateStart!='' ">
+            <![CDATA[   and h.order_date >= #{orderDateStart}  ]]>
+        </if>
+        <if test="orderDateEnd != null and orderDateEnd!='' ">
+            <![CDATA[   and h.order_date <= #{orderDateEnd}  ]]>
+        </if>
+        order by h.order_no desc
+    </select>
+
+
+    <insert id="saveOrderHead" parameterType="TOrderHead">
+        insert into order_head (
+        id,
+        order_no,
+        company_code,
+        company,
+        supplier_code,
+        supplier_name,
+        order_date,
+        project_code,
+        arrival_date,
+        req_dept,
+        req_name,
+        purchaser,
+        pay_type,
+        total_money,
+        actual_money,
+        rest_money,
+        order_status,
+        note,
+        status,
+        create_by,
+        create_date)
+        values (
+        #{id},
+        #{orderNo},
+        #{companyCode},
+        #{company},
+        #{supplierCode},
+        #{supplierName},
+        #{orderDate},
+        #{projectCode},
+        #{arrivalDate},
+        #{reqDept},
+        #{reqName},
+        #{purchaser},
+        #{payType},
+        #{totalMoney},
+        #{actualMoney},
+        #{restMoney},
+        #{orderStatus},
+        #{note},
+        #{status},
+        #{createBy},
+        #{createDate})
+    </insert>
+
+    <select id="getOrderHeadByOrderNo" resultType="TOrderHead" parameterType="java.lang.String">
+        select
+        h.id,
+        h.order_no orderNo,
+        h.company_code companyCode,
+        h.company,
+        h.supplier_code supplierCode,
+        h.supplier_name supplierName,
+        h.order_date orderDate,
+        h.project_code projectCode,
+        d.name projectName,
+        h.arrival_date arrivalDate,
+        h.req_dept reqDept,
+        h.req_name reqName,
+        h.purchaser,
+        h.pay_type payType,
+        h.total_money totalMoney,
+        h.actual_money actualMoney,
+        h.rest_money restMoney,
+        h.order_status orderStatus,
+        d1.name orderStatusStr,
+        h.note
+        from order_head h
+        left join data_dictionary d on h.project_code=d.code and d.group_code='HC008'
+         left join data_dictionary d1 on h.order_status=d1.code and d1.group_code='HC010'
+        where h.status!='003' and h.order_no=#{_parameter}
+    </select>
+
+
+    <select id="checkOrderStatus" resultType="java.lang.Integer">
+        select count(1) from order_head where order_no=#{orderNo}  and order_status!=#{orderStatus} and status!='003'
+    </select>
+
+    <select id="checkOrderStatusBatch" resultType="java.lang.Integer">
+        select count(1) from order_head where order_no in
+        <foreach collection="orderNoList" item="orderNo" index="index" open="(" close=")" separator=",">
+            #{orderNo}
+        </foreach>
+        and order_status!=#{orderStatus} and status!='003'
+    </select>
+
+
+    <update id="updateOrderStatus" parameterType="java.util.Map">
+        update order_head
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderStatus != null">
+                order_status = #{orderStatus},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            order_no = #{orderNo}
+        </where>
+    </update>
+
+    <update id="updateOrderStatusBatch" parameterType="java.util.Map">
+        update order_head
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderStatus != null">
+                order_status = #{orderStatus},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            order_no in
+            <foreach collection="orderNoList" item="orderNo" index="index" open="(" close=")" separator=",">
+                #{orderNo}
+            </foreach>
+        </where>
+    </update>
+
+    <update id="updateOrderHead" parameterType="TOrderHead">
+        update order_head
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderStatus != null">
+                order_status = #{orderStatus},
+            </if>
+            <if test="supplierCode != null">
+                supplier_code = #{supplierCode},
+            </if>
+            <if test="supplierName != null">
+                supplier_name = #{supplierName},
+            </if>
+            <if test="orderDate != null">
+                order_date = #{orderDate},
+            </if>
+            <if test="arrivalDate != null">
+                arrival_date = #{arrivalDate},
+            </if>
+            <if test="payType != null">
+                pay_type = #{payType},
+            </if>
+            <if test="totalMoney != null">
+                total_money = #{totalMoney},
+            </if>
+            <if test="actualMoney != null">
+                actual_money = #{actualMoney},
+            </if>
+            <if test="restMoney != null">
+                rest_money = #{restMoney},
+            </if>
+            <if test="note != null">
+                note = #{note},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>

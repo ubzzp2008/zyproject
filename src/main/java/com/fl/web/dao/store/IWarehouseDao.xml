@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.store.IWarehouseDao">
+
+    <resultMap type="TWarehouse" id="warehouseMap">
+        <result property="id" column="id"/>
+        <result property="companyCode" column="company_code"/>
+        <result property="company" column="company"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="addr" column="addr"/>
+        <result property="contact" column="contact"/>
+        <result property="phone" column="phone"/>
+        <result property="safeNum" column="safe_num"/>
+        <result property="num" column="num"/>
+        <result property="note" column="note"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <select id="queryWarehouseList" resultMap="warehouseMap" parameterType="Warehouse">
+        select
+        w.id,
+        w.company_code,
+        w.company,
+        w.code,
+        w.name,
+        w.addr,
+        w.contact,
+        w.phone,
+        w.safe_num,
+        w.num,
+        w.note
+        from
+        warehouse w
+        where w.status!='003'
+        <if test="code != null">
+            and w.code like #{code}
+        </if>
+        <if test="name != null">
+            and w.name like #{name}
+        </if>
+        order by w.code
+    </select>
+
+    <insert id="saveWarehouse" parameterType="TWarehouse">
+        insert into warehouse(id,company_code,company,code,name,addr,contact,phone,safe_num,num,note,status,create_by,create_date)
+        values
+        (#{id},#{companyCode},#{company},#{code},#{name},#{addr},#{contact},#{phone},#{safeNum},#{num},#{note},#{status},
+        #{createBy},#{createDate})
+    </insert>
+
+    <select id="getWarehouseByCode" resultType="TWarehouse" parameterType="java.lang.String">
+        SELECT
+        w.id,
+        w.company_code companyCode,
+        w.company,
+        w.code,
+        w.name,
+        w.addr,
+        w.contact,
+        w.phone,
+        w.safe_num safeNum,
+        w.num,
+        w.note
+        FROM
+        warehouse w
+        where w.status!='003' and w.code=#{_parameter}
+    </select>
+
+    <select id="getWarehouseById" resultType="TWarehouse" parameterType="java.lang.String">
+        SELECT
+        w.id,
+        w.company_code companyCode,
+        w.company,
+        w.code,
+        w.name,
+        w.addr,
+        w.contact,
+        w.phone,
+        w.safe_num safeNum,
+        w.num,
+        w.note
+        FROM
+        warehouse w
+        where w.status!='003' and w.id=#{_parameter}
+    </select>
+
+    <update id="updateWarehouse" parameterType="TWarehouse">
+        update warehouse
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="addr != null">
+                addr = #{addr},
+            </if>
+            <if test="contact != null">
+                contact = #{contact},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="safeNum != null">
+                safe_num = #{safeNum},
+            </if>
+            <if test="num != null">
+                num = #{num},
+            </if>
+            <if test="note != null">
+                note = #{note},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>

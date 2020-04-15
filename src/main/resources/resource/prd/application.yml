@@ -1,0 +1,80 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /hcerp
+    session:
+      timeout: 14400s  #4小时  60*60*4
+spring:
+  profiles:
+    active: prd
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB #文件上传单个文件最大值
+      max-request-size: 100MB #文件上传文件总大小
+  datasource:
+    name: mysql
+    type: com.alibaba.druid.pool.DruidDataSource
+    #druid相关配置
+    druid:
+      #监控统计拦截的filters
+      filters: stat
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      #基本属性
+      #url: jdbc:mysql://10.1.0.211:3306/hcerp?useUnicode=true&useSSL=false&characterEncoding=UTF-8&allowMultiQueries=true
+      url: ENC(TBds3gwFuYaB1WJ6o3Yfb0KfL9mFDWtc8ru8V9dLp4UHH6t1/goWVcey0bV45LKn3ElZ4yIw/4U308G553JTIBI5BNtS+INiN3MNPnsy4S1/NmvRft1shBJCWGL7AywZlYvvwupneMHy5E7tg4VqCQhNofkF5GYA)
+      username: ENC(7hJxJvMfvPAJoT2+b0WhAA==)
+      password: ENC(thvLryMS0ssNYd8bxluEXA==)
+      #配置初始化大小/最小/最大
+      initial-size: 1
+      min-idle: 1
+      max-active: 20
+      #获取连接等待超时时间
+      max-wait: 60000
+      #间隔多久进行一次检测，检测需要关闭的空闲连接
+      time-between-eviction-runs-millis: 60000
+      #一个连接在池中最小生存的时间
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+#  thymeleaf:
+#    prefix: classpath:/templates/
+#    suffix: .html
+
+#mybatise配置
+mybatis:
+  typeAliasesPackage: com.fl.web.entity,com.fl.web.model
+  mapperLocations: classpath:hc/manager/web/dao/*.xml
+  config-location: classpath:mybatis-config.xml
+
+#自定义文件上传配置
+file:
+  virtualPath: /upload/   #虚拟路径，结尾必须加上"/"
+  uploadFolder: /home/hcsci/java/fileupload/   #附件上传目录，结尾必须加上"/"
+  exportPath: /home/hcsci/java/export/  #导出文件存放路劲，结尾必须加上"/"
+
+#ldap:
+#  url: ENC(jyg7Rc/MGEyXUc4CO8dnKF+7iZRoJ4wJymsUC4HSXs0=)
+#  username: ENC(TI0tpnyPUOPMe0K7mUyR6g==)
+#  password: ENC(UCScslqaOufuPVuP+i8YFMWnkM56lyZa)
+
+#pagehelper
+pagehelper:
+  helperDialect: mysql
+  reasonable: false
+  supportMethodsArguments: true
+  params: count=countSql
+  returnPageInfo: check
+
+logging:
+  path:
+    ./logs
+  config:
+    classpath:logback-spring.xml
+  level:
+    org.thymeleaf: info

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.mdm.IDataDicTypeDao">
+
+    <resultMap type="TDataDicType" id="dicTypeMap">
+        <result property="id" column="id"/>
+        <result property="groupCode" column="group_code"/>
+        <result property="groupName" column="group_name"/>
+        <result property="sortnum" column="sortnum"/>
+    </resultMap>
+
+    <!-- 	根据type获取数据 -->
+    <select id="getAllDicType" resultMap="dicTypeMap">
+        select group_code,group_name
+		from data_dic_type
+		order by sortnum
+	</select>
+
+
+</mapper>
