@@ -13,7 +13,7 @@ public interface ICustomerService {
 
     void deleteCustomer(String id);
 
-    TCustomer checkPhoneExist(String phone);
+    TCustomer getCustomerByPhone(String phone);
 
     TCustomer getCustomerById(String id);
 

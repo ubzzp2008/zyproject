@@ -53,8 +53,8 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
-    public TCustomer checkPhoneExist(String phone) {
-        return customerDao.checkPhoneExist(phone);
+    public TCustomer getCustomerByPhone(String phone) {
+        return customerDao.getCustomerByPhone(phone);
     }
 
     @Override

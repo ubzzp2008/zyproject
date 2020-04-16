@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.shop.IGoodsDao">
+
+    <resultMap type="TGoods" id="goodsMap">
+        <result property="id" column="id"/>
+        <result property="goodsCode" column="goods_code"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="unit" column="unit"/>
+        <result property="price" column="price"/>
+        <result property="disPrice" column="dis_price"/>
+        <result property="sortnum" column="sortnum"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+
+    <select id="queryGoodsList" resultMap="goodsMap" parameterType="Goods">
+        select
+        t.id,
+        t.goods_code,
+        t.goods_name,
+        t.unit,
+        t.price,
+        t.dis_price,
+        t.sortnum,
+        t.create_by,
+        t.create_date,
+        t.update_by,
+        t.update_date
+        from
+        goods_info t
+        where t.status!='003'
+        <if test="goodsCode != null">
+            and t.goods_code like #{goodsCode}
+        </if>
+        <if test="goodsName != null">
+            and t.goods_name like #{goodsName}
+        </if>
+        order by t.sortnum
+    </select>
+
+    <insert id="saveGoods" parameterType="TGoods">
+        insert into goods_info (id,goods_code,goods_name,unit,price,dis_price,sortnum,create_by,create_date,status)
+        values (#{id}, #{goodsCode},#{goodsName},#{unit},#{price},#{disPrice},#{sortnum},#{createBy},#{createDate},#{status})
+    </insert>
+
+    <update id="updateGoods" parameterType="TGoods">
+        update goods_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="goodsName != null">
+                goods_name = #{goodsName},
+            </if>
+            <if test="unit != null">
+                unit = #{unit},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="disPrice != null">
+                dis_price = #{disPrice},
+            </if>
+            <if test="sortnum != null">
+                sortnum = #{sortnum},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate},
+            </if>
+        </trim>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>
