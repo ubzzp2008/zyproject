@@ -64,4 +64,11 @@ public interface IDeskDao {
      * @date：2019-10-10 09:43
      */
     public List<TDesk> queryDeskList(Desk desk);
+
+    /**
+     * @description：获取可用桌号
+     * @author：justin
+     * @date：2019-10-10 09:43
+     */
+    public List<TDesk> getUseableDeskList();
 }

@@ -17,4 +17,10 @@ public interface IOrderInfoService {
     void saveOrder(OrderEntity info);
 
     List<TOrderInfo> getOrderDeskList();
+
+    List<TOrderInfo> getOrderByDeskId(String deskId);
+
+    void deleteOrderInfo(String id);
+
+    void deleteOrderByDeskId(String deskId);
 }

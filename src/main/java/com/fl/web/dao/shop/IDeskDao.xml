@@ -61,4 +61,16 @@
         </where>
     </update>
 
+
+    <select id="getUseableDeskList" resultMap="deskMap">
+        select
+        t.id,
+        t.desk_code,
+        t.desk_name
+        from
+        desk_info t
+        where t.status!='003'
+        order by t.sortnum
+    </select>
+
 </mapper>

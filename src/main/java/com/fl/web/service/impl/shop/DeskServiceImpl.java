@@ -68,7 +68,7 @@ public class DeskServiceImpl implements IDeskService {
     }
 
     @Override
-    public List<TDesk> getAllDeskList() {
-        return deskDao.queryDeskList(new Desk());
+    public List<TDesk> getUseableDeskList() {
+        return deskDao.getUseableDeskList();
     }
 }

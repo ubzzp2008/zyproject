@@ -6,24 +6,14 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-/**
- * @version V0.1
- * @项目名称：demo-service
- * @类名称：TOrderInfo
- * @类描述：
- * @创建人：justin
- * @创建时间：2020-04-17 16:32
- */
 @Getter
 @Setter
-public class TOrderInfo extends BaseEntity {
-    private String deskId;
-    private String deskCode;
-    private String deskName;
+public class TOrderReport extends BaseEntity {
     private String goodsCode;
     private String goodsName;
     private String unit;
     private Integer num;
     private BigDecimal price;
     private BigDecimal money;
+    private String orderDate;
 }

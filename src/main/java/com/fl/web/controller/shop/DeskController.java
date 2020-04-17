@@ -188,11 +188,11 @@ public class DeskController extends BaseController {
      * @author：justin
      * @date：2020-04-16 15:08
      */
-    @GetMapping(value = "/getAllDeskList")
-    public void getAllDeskList(HttpServletResponse response) {
+    @GetMapping(value = "/getUseableDeskList")
+    public void getUseableDeskList(HttpServletResponse response) {
         AjaxJson json = new AjaxJson();
         try {
-            List<TDesk> list = deskService.getAllDeskList();
+            List<TDesk> list = deskService.getUseableDeskList();
             json.setSuccess(true);
             json.setObj(list);
         } catch (Exception e) {

@@ -19,7 +19,5 @@ public class OrderEntity {
     private String deskId;
     private String deskCode;
     private String deskName;
-    private String custName;
-    private String custPhone;
     private List<TOrderInfo> itemList;
 }

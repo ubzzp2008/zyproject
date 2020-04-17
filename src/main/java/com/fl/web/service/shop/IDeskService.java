@@ -27,5 +27,5 @@ public interface IDeskService {
 
     TDesk getDeskById(String id);
 
-    List<TDesk> getAllDeskList();
+    List<TDesk> getUseableDeskList();
 }

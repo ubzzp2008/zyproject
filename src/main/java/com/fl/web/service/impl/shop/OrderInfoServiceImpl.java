@@ -5,7 +5,6 @@ import com.fl.web.entity.shop.OrderEntity;
 import com.fl.web.entity.shop.TOrderInfo;
 import com.fl.web.service.shop.IOrderInfoService;
 import com.fl.web.utils.StaticParam;
-import com.fl.web.utils.StringUtil;
 import com.fl.web.utils.UUIDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,9 +36,6 @@ public class OrderInfoServiceImpl implements IOrderInfoService {
             order.setDeskId(info.getDeskId());
             order.setDeskCode(info.getDeskCode());
             order.setDeskName(info.getDeskName());
-            order.setCustName(info.getCustName());
-            order.setCustPhone(info.getCustPhone());
-            order.setCustFlag(StringUtil.isNotEmpty(info.getCustPhone()) ? "Y" : "N");
             order.setStatus(StaticParam.ADD);
             order.setCreateDate(new Date());
             infoList.add(order);
@@ -50,5 +46,20 @@ public class OrderInfoServiceImpl implements IOrderInfoService {
     @Override
     public List<TOrderInfo> getOrderDeskList() {
         return orderInfoDao.getOrderDeskList();
+    }
+
+    @Override
+    public List<TOrderInfo> getOrderByDeskId(String deskId) {
+        return orderInfoDao.getOrderByDeskId(deskId);
+    }
+
+    @Override
+    public void deleteOrderInfo(String id) {
+        orderInfoDao.deleteOrderInfo(id);
+    }
+
+    @Override
+    public void deleteOrderByDeskId(String deskId) {
+        orderInfoDao.deleteOrderByDeskId(deskId);
     }
 }

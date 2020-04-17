@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fl.web.dao.shop.IOrderReportDao">
+
+    <resultMap type="TOrderReport" id="orderReportMap">
+        <result property="id" column="id"/>
+        <result property="goodsCode" column="goods_code"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="unit" column="unit"/>
+        <result property="num" column="num"/>
+        <result property="price" column="price"/>
+        <result property="money" column="money"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <insert id="saveOrderReportBatch" parameterType="java.util.List">
+        insert into order_report
+        (id,goods_code,goods_name,unit,num,price,money,order_date,status,create_by,create_date)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.goodsCode},#{item.goodsName},#{item.unit},#{item.num},#{item.price},
+            #{item.money},#{item.orderDate},#{item.status},#{item.createBy},#{item.createDate})
+        </foreach>
+    </insert>
+
+    <select id="queryOrderReportList" resultMap="orderReportMap" parameterType="OrderReport">
+        select id,goods_code,goods_name,unit,num,price,money,order_date
+        from order_report
+        where status!='003'
+        <if test="goodsCode != null">
+            and goods_code like #{goodsCode}
+        </if>
+        <if test="goodsName != null">
+            and goods_name like #{goodsName}
+        </if>
+        <if test="orderDate != null">
+            and order_date = #{orderDate}
+        </if>
+        order by order_date desc
+    </select>
+
+</mapper>

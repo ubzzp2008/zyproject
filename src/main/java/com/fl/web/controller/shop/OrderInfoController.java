@@ -9,10 +9,7 @@ import com.fl.web.utils.StringUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -71,6 +68,55 @@ public class OrderInfoController extends BaseController {
             json.setMsg("程序异常,请联系管理员!" + e.getMessage());
             e.printStackTrace();
             logger.error("系统异常", e);
+        }
+        writeJson(json, response);
+    }
+
+    @GetMapping(value = "/getOrderByDeskId")
+    public void getOrderByDeskId(@RequestParam("deskId") String deskId, HttpServletResponse response) {
+        AjaxJson json = new AjaxJson();
+        try {
+            List<TOrderInfo> p = orderInfoService.getOrderByDeskId(deskId);
+            json.setSuccess(true);
+            json.setObj(p);
+        } catch (Exception e) {
+            json.setSuccess(false);
+            json.setMsg("程序异常,请联系管理员!" + e.getMessage());
+            e.printStackTrace();
+            logger.error("系统异常", e);
+        }
+        writeJson(json, response);
+    }
+
+    @PostMapping(value = "/deleteOrderInfo")
+    public void deleteOrderInfo(@RequestParam(name = "id") String id, HttpServletResponse response) {
+        AjaxJson json = new AjaxJson();
+        try {
+            orderInfoService.deleteOrderInfo(id);
+            json.setSuccess(true);
+            json.setMsg("删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("系统异常", e);
+            json.setSuccess(false);
+            json.setMsg("系统异常：" + e.getMessage());
+        }
+        writeJson(json, response);
+    }
+
+
+    @PostMapping(value = "/cancleOrder")
+    public void cancleOrder(@RequestParam(name = "deskId") String deskId, HttpServletResponse response) {
+        AjaxJson json = new AjaxJson();
+        try {
+            orderInfoService.deleteOrderByDeskId(deskId);
+            json.setSuccess(true);
+            json.setMsg("作废成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("系统异常", e);
+            json.setSuccess(false);
+            json.setMsg("系统异常：" + e.getMessage());
         }
         writeJson(json, response);
     }
